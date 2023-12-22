@@ -29,17 +29,9 @@ func InitDB() {
 
 	sqlDB, err := db.DB()
 
-	// Testar a conexão
-	err = sqlDB.Ping()
-	if err != nil {
-		log.Fatal("Erro ao testar a conexão:", err)
-	}
-
 	// Verificar a conexão
 	if err != nil {
 		log.Fatal("Erro ao obter o DB:", err)
+		sqlDB.Close()
 	}
-	defer sqlDB.Close()
-
-	log.Println("Conexão bem-sucedida com o PostgresSQL")
 }
