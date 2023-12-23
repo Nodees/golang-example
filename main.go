@@ -2,20 +2,22 @@ package main
 
 import (
 	connection "core/connections"
-	"core/controllers"
 	"core/models"
+	"core/routes"
+	"log"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
-	r := gin.Default()
+	app := fiber.New()
+	app.Use(cors.New())
 
 	connection.InitDB()
 	connection.DB.AutoMigrate(&models.User{}, &models.Address{})
 
-	r.GET("/users", controllers.UserList)
-	r.GET("/address", controllers.AddressList)
+	routes.SetupRoute(app)
 
-	r.Run()
+	log.Fatal(app.Listen(":8000"))
 }

@@ -1,21 +1,16 @@
 package controllers
 
 import (
-	"net/http"
-
 	connection "core/connections"
+
 	"core/models"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
-func UserList(c *gin.Context) {
+func UserList(c *fiber.Ctx) error {
 	var users []models.User
-
 	connection.DB.Find(&users)
 	connection.DB.Preload("Address").Find(&users)
-
-	c.JSON(http.StatusOK, gin.H{
-		"results": users,
-	})
+	return c.JSON(users)
 }
