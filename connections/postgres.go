@@ -14,8 +14,8 @@ func InitDB() {
 	host := "localhost"
 	user := "postgres"
 	dbpassword := "fpf2023"
-	dbname := "golang"
-	port := "5432"
+	dbname := "Go"
+	port := "5433"
 	sslmode := "disable"
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, dbpassword, dbname, port, sslmode)

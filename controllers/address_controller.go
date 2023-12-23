@@ -1,20 +1,15 @@
 package controllers
 
 import (
-	"net/http"
-
 	connection "core/connections"
+
 	"core/models"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
-func AddressList(c *gin.Context) {
+func AddressList(c *fiber.Ctx) error {
 	var address []models.Address
-
 	connection.DB.Find(&address)
-
-	c.JSON(http.StatusOK, gin.H{
-		"results": address,
-	})
+	return c.JSON(address)
 }
