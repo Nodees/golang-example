@@ -2,7 +2,6 @@ package controllers
 
 import (
 	connection "core/connections"
-
 	"core/models"
 
 	"github.com/gofiber/fiber/v2"

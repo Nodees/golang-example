@@ -1,6 +1,7 @@
 package main
 
 import (
+	"core/config"
 	connection "core/connections"
 	"core/models"
 	"core/routes"
@@ -14,7 +15,12 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New())
 
-	connection.InitDB()
+	loadConfig, err := config.LoadConfig(".")
+	if err != nil {
+		log.Fatal("Não foi possivel carregar variaveis de ambiente: ", err)
+	}
+
+	connection.InitDB(&loadConfig)
 	connection.DB.AutoMigrate(&models.User{}, &models.Address{})
 
 	routes.SetupRoute(app)
