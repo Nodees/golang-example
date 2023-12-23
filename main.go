@@ -7,5 +7,5 @@ import (
 
 func main() {
 	postgres.InitDB()
-	postgres.DB.AutoMigrate(&models.User{})
+	postgres.DB.AutoMigrate(&models.User{}, &models.Address{})
 }
