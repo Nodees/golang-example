@@ -1,11 +1,21 @@
 package main
 
 import (
-	postgres "core/connections"
-	models "core/models"
+	connection "core/connections"
+	"core/controllers"
+	"core/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	postgres.InitDB()
-	postgres.DB.AutoMigrate(&models.User{}, &models.Address{})
+	r := gin.Default()
+
+	connection.InitDB()
+	connection.DB.AutoMigrate(&models.User{}, &models.Address{})
+
+	r.GET("/users", controllers.UserList)
+	r.GET("/address", controllers.AddressList)
+
+	r.Run()
 }
