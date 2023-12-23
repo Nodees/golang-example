@@ -21,7 +21,10 @@ func main() {
 	}
 
 	connection.InitDB(&loadConfig)
-	connection.DB.AutoMigrate(&models.User{}, &models.Address{})
+	connection.DB.AutoMigrate(
+		&models.User{},
+		&models.Address{},
+	)
 
 	routes.SetupRoute(app)
 
