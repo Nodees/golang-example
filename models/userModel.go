@@ -1,16 +1,14 @@
 package models
 
-import "gorm.io/gorm"
-
 type User struct {
-	gorm.Model
+	BaseModel
 	Name      string
-	AddressID int
-	Address   Address `gorm:"constraint:OnUpdate:CASCADE,OnDelete:NO ACTION"`
+	AddressID *int
+	Address   *Address `gorm:"constraint:OnUpdate:CASCADE,OnDelete:NO ACTION"`
 }
 
 type Address struct {
-	gorm.Model
+	BaseModel
 	Cep          string
 	Street       string
 	Neighborhood string
