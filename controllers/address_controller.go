@@ -3,8 +3,6 @@ package controllers
 import (
 	connection "core/connections"
 	"core/models"
-	"fmt"
-	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,10 +18,8 @@ func AddressList(c *fiber.Ctx) error {
 func AddressCreate(c *fiber.Ctx) error {
 	address := new(models.Address)
 
-	log.Fatal(fmt.Sprint(c.BodyParser(address)))
-
 	if err := c.BodyParser(address); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	connection.DB.Create(&address)
@@ -37,9 +33,24 @@ func AddressRetrieve(c *fiber.Ctx) error {
 	connection.DB.Find(&address, id)
 
 	if address.ID == 0 {
-		return c.Status(404).SendString("Address not found")
+		return c.Status(fiber.StatusNotFound).SendString("Address not found")
 	}
 
+	return c.JSON(address)
+}
+
+func AddressUpdate(c *fiber.Ctx) error {
+	var address models.Address
+
+	id := c.Params("id")
+	if err := connection.DB.First(&address, id).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Record not found"})
+	}
+
+	updateData := new(models.Address)
+	if err := connection.DB.Model(&address).Updates(updateData).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update record"})
+	}
 	return c.JSON(address)
 }
 
@@ -50,7 +61,7 @@ func AddressDestroy(c *fiber.Ctx) error {
 	connection.DB.First(&address, id)
 
 	if address.ID == 0 {
-		return c.Status(404).SendString("Address not found")
+		return c.Status(fiber.StatusNotFound).SendString("Address not found")
 	}
 
 	connection.DB.Unscoped().Delete(&address)
