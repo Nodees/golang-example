@@ -8,4 +8,6 @@ import (
 
 func AddressSetupRoutes(app *fiber.App) {
 	app.Get("/api/address", controllers.AddressList)
+	app.Get("/api/address/:id", controllers.AddressRetrieve)
+	app.Delete("/api/address/:id", controllers.AddressDestroy)
 }

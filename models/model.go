@@ -4,7 +4,7 @@ type User struct {
 	BaseModel
 	Name      string
 	AddressID *int
-	Address   *Address `gorm:"constraint:OnUpdate:CASCADE,OnDelete:NO ACTION"`
+	Address   *Address `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 }
 
 type Address struct {
