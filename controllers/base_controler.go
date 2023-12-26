@@ -7,12 +7,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func AddressList(c *fiber.Ctx) error {
-	var addresses []models.Address
-	return BaseList(c, addresses)
+func BaseList(c *fiber.Ctx, model interface{}) error {
+	connection.DB.Find(&model)
+	return c.JSON(model)
 }
 
-func AddressCreate(c *fiber.Ctx) error {
+func BaseCreate(c *fiber.Ctx) error {
 	address := new(models.Address)
 
 	if err := c.BodyParser(address); err != nil {
@@ -23,7 +23,7 @@ func AddressCreate(c *fiber.Ctx) error {
 	return c.JSON(address)
 }
 
-func AddressRetrieve(c *fiber.Ctx) error {
+func BaseRetrieve(c *fiber.Ctx) error {
 	var address models.Address
 
 	id := c.Params("id")
@@ -36,7 +36,7 @@ func AddressRetrieve(c *fiber.Ctx) error {
 	return c.JSON(address)
 }
 
-func AddressUpdate(c *fiber.Ctx) error {
+func BaseUpdate(c *fiber.Ctx) error {
 	var address models.Address
 	id := c.Params("id")
 
@@ -56,7 +56,7 @@ func AddressUpdate(c *fiber.Ctx) error {
 	return c.JSON(address)
 }
 
-func AddressDestroy(c *fiber.Ctx) error {
+func BaseDestroy(c *fiber.Ctx) error {
 	var address models.Address
 
 	id := c.Params("id")
