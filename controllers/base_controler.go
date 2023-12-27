@@ -2,7 +2,6 @@ package controllers
 
 import (
 	connection "core/connections"
-	"core/models"
 	"errors"
 	"net/http"
 
@@ -14,11 +13,13 @@ func BaseList[T any](preloads ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		models := new([]T)
 		query := connection.DB
+
 		if len(preloads) > 0 {
 			for _, preload := range preloads {
 				query = query.Preload(preload)
 			}
 		}
+
 		result := query.Find(models)
 		if result.Error != nil {
 			return result.Error
@@ -28,22 +29,34 @@ func BaseList[T any](preloads ...string) fiber.Handler {
 	}
 }
 
-func BaseCreate(c *fiber.Ctx) error {
-	address := new(models.Address)
-
-	if err := c.BodyParser(address); err != nil {
-		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
+func BaseCreate[T any]() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		model := new(T)
+		err := c.BodyParser(model)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+		}
+		result := connection.DB.Create(model)
+		if result.Error != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create record"})
+		}
+		return c.JSON(model)
 	}
-
-	connection.DB.Create(&address)
-	return c.JSON(address)
 }
 
-func BaseRetrieve[T any]() fiber.Handler {
+func BaseRetrieve[T any](preloads ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id := c.Params("id")
 		model := new(T)
-		result := connection.DB.First(model, id)
+		query := connection.DB.Model(model).Where("id = ?", id)
+
+		if len(preloads) > 0 {
+			for _, preload := range preloads {
+				query = query.Preload(preload)
+			}
+		}
+
+		result := query.First(model)
 		if result.Error != nil {
 			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 				return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "Record not found"})

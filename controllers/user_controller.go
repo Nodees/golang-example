@@ -11,8 +11,13 @@ func UserList(c *fiber.Ctx) error {
 	return result(c)
 }
 
+func UserCreate(c *fiber.Ctx) error {
+	result := BaseCreate[models.User]()
+	return result(c)
+}
+
 func UserRetrive(c *fiber.Ctx) error {
-	result := BaseRetrieve[models.User]()
+	result := BaseRetrieve[models.User]("Address")
 	return result(c)
 }
 
