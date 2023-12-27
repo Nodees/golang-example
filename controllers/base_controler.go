@@ -10,10 +10,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func BaseList[T any]() fiber.Handler {
+func BaseList[T any](preloads ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		models := new([]T)
-		result := connection.DB.Find(models)
+		query := connection.DB
+		if len(preloads) > 0 {
+			for _, preload := range preloads {
+				query = query.Preload(preload)
+			}
+		}
+		result := query.Find(models)
 		if result.Error != nil {
 			return result.Error
 		}
