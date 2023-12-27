@@ -7,8 +7,8 @@ import (
 
 type User struct {
 	BaseModel
-	Name      string
-	Username  string
+	Name      string `json:"name" validate:"required,min=8"`
+	Username  string `json:"username" validate:"required,min=8"`
 	Email     *string
 	Password  string `json:"password" binding:"required,min=8"`
 	AddressID *int
@@ -17,14 +17,14 @@ type User struct {
 
 type Address struct {
 	BaseModel
-	Cep          string
-	Street       string
-	Neighborhood string
-	City         string
-	State        string
+	Cep          *string `json:"cep"`
+	Street       *string `json:"street"`
+	Neighborhood *string `json:"neighborhood"`
+	City         *string `json:"city"`
+	State        *string `json:"state"`
 }
 
-func (u *User) BeforeSave(tx *gorm.DB) error {
+func (u *User) BeforeCreate(tx *gorm.DB) error {
 	hashedPassword, err := hashPassword(u.Password)
 	if err != nil {
 		return err
