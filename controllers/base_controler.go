@@ -3,13 +3,23 @@ package controllers
 import (
 	connection "core/connections"
 	"core/models"
+	"errors"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
-func BaseList(c *fiber.Ctx, model interface{}) error {
-	connection.DB.Find(&model)
-	return c.JSON(model)
+func BaseList[T any]() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		models := new([]T)
+		result := connection.DB.Find(models)
+		if result.Error != nil {
+			return result.Error
+		}
+		c.SendStatus(http.StatusOK)
+		return c.JSON(models)
+	}
 }
 
 func BaseCreate(c *fiber.Ctx) error {
@@ -23,49 +33,45 @@ func BaseCreate(c *fiber.Ctx) error {
 	return c.JSON(address)
 }
 
-func BaseRetrieve(c *fiber.Ctx) error {
-	var address models.Address
-
-	id := c.Params("id")
-	connection.DB.Find(&address, id)
-
-	if address.ID == 0 {
-		return c.Status(fiber.StatusNotFound).SendString("Address not found")
+func BaseRetrieve[T any]() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		model := new(T)
+		result := connection.DB.First(model, id)
+		if result.Error != nil {
+			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+				return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "Record not found"})
+			}
+			return result.Error
+		}
+		return c.JSON(model)
 	}
-
-	return c.JSON(address)
 }
 
-func BaseUpdate(c *fiber.Ctx) error {
-	var address models.Address
-	id := c.Params("id")
-
-	if err := connection.DB.First(&address, id).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Record not found"})
+func BaseUpdate[T any]() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		model := new(T)
+		err := c.BodyParser(model)
+		if err != nil {
+			return err
+		}
+		result := connection.DB.Model(model).Where("id = ?", id).Updates(model)
+		if result.Error != nil {
+			return result.Error
+		}
+		return c.SendStatus(http.StatusOK)
 	}
-
-	var updateData map[string]interface{}
-	if err := c.BodyParser(&updateData); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
-	}
-
-	if err := connection.DB.Model(&address).Updates(updateData).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update record"})
-	}
-
-	return c.JSON(address)
 }
 
-func BaseDestroy(c *fiber.Ctx) error {
-	var address models.Address
-
-	id := c.Params("id")
-	connection.DB.First(&address, id)
-
-	if address.ID == 0 {
-		return c.Status(fiber.StatusNotFound).SendString("Address not found")
+func BaseDestroy[T any]() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		model := new(T)
+		result := connection.DB.Where("id = ?", id).Delete(model)
+		if result.Error != nil {
+			return result.Error
+		}
+		return c.SendStatus(http.StatusOK)
 	}
-
-	connection.DB.Unscoped().Delete(&address)
-	return c.JSON(address)
 }

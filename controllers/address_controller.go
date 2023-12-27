@@ -8,8 +8,8 @@ import (
 )
 
 func AddressList(c *fiber.Ctx) error {
-	var addresses []models.Address
-	return BaseList(c, addresses)
+	result := BaseList[models.Address]()
+	return result(c)
 }
 
 func AddressCreate(c *fiber.Ctx) error {
@@ -24,48 +24,16 @@ func AddressCreate(c *fiber.Ctx) error {
 }
 
 func AddressRetrieve(c *fiber.Ctx) error {
-	var address models.Address
-
-	id := c.Params("id")
-	connection.DB.Find(&address, id)
-
-	if address.ID == 0 {
-		return c.Status(fiber.StatusNotFound).SendString("Address not found")
-	}
-
-	return c.JSON(address)
+	result := BaseRetrieve[models.Address]()
+	return result(c)
 }
 
 func AddressUpdate(c *fiber.Ctx) error {
-	var address models.Address
-	id := c.Params("id")
-
-	if err := connection.DB.First(&address, id).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Record not found"})
-	}
-
-	var updateData map[string]interface{}
-	if err := c.BodyParser(&updateData); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
-	}
-
-	if err := connection.DB.Model(&address).Updates(updateData).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update record"})
-	}
-
-	return c.JSON(address)
+	result := BaseUpdate[models.Address]()
+	return result(c)
 }
 
 func AddressDestroy(c *fiber.Ctx) error {
-	var address models.Address
-
-	id := c.Params("id")
-	connection.DB.First(&address, id)
-
-	if address.ID == 0 {
-		return c.Status(fiber.StatusNotFound).SendString("Address not found")
-	}
-
-	connection.DB.Unscoped().Delete(&address)
-	return c.JSON(address)
+	result := BaseDestroy[models.Address]()
+	return result(c)
 }
