@@ -48,7 +48,7 @@ func BaseRetrieve[T any](preloads ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id := c.Params("id")
 		model := new(T)
-		query := connection.DB.Model(model).Where("id = ?", id)
+		query := connection.DB.Find(&model, id)
 
 		if len(preloads) > 0 {
 			for _, preload := range preloads {
@@ -75,7 +75,7 @@ func BaseUpdate[T any]() fiber.Handler {
 		if err != nil {
 			return err
 		}
-		result := connection.DB.Model(model).Where("id = ?", id).Updates(model)
+		result := connection.DB.Find(model, id).Updates(model)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -87,7 +87,7 @@ func BaseDestroy[T any]() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id := c.Params("id")
 		model := new(T)
-		result := connection.DB.Where("id = ?", id).Delete(model)
+		result := connection.DB.Find(model, id).Delete(model)
 		if result.Error != nil {
 			return result.Error
 		}

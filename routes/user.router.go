@@ -7,7 +7,9 @@ import (
 )
 
 func UserSetupRoutes(app *fiber.App) {
-	app.Get("/api/users", controllers.UserList)
+	app.Get("/api/user", controllers.UserList)
+	app.Post("/api/user/login", controllers.Login)
+	app.Get("/api/user/logout", controllers.Logout)
 	app.Post("/api/user", controllers.UserCreate)
 	app.Get("/api/user/:id", controllers.UserRetrive)
 	app.Delete("/api/user/:id", controllers.UserDestroy)

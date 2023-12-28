@@ -1,6 +1,10 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"time"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	DBHost     string `mapstructure:"POSTGRES_HOST"`
@@ -9,6 +13,13 @@ type Config struct {
 	DBName     string `mapstructure:"POSTGRES_DB"`
 	DBPort     string `mapstructure:"POSTGRES_PORT"`
 	Sslmode    string `mapstructure:"SSL_MODE"`
+
+	JwtSecret    string        `mapstructure:"JWT_SECRET"`
+	JwtExpiresIn time.Duration `mapstructure:"JWT_EXPIRED_IN"`
+	JwtMaxAge    int           `mapstructure:"JWT_MAXAGE"`
+
+	ClientOrigin string `mapstructure:"CLIENT_ORIGIN"`
+	Domain       string `mapstructure:"DOMAIN"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

@@ -1,7 +1,8 @@
 package models
 
 import (
-	"golang.org/x/crypto/bcrypt"
+	"core/utils"
+
 	"gorm.io/gorm"
 )
 
@@ -15,6 +16,20 @@ type User struct {
 	Address   *Address `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 }
 
+type UserResponse struct {
+	Name     string
+	Username string
+	Email    string
+}
+
+func FilterUserRecord(user *User) UserResponse {
+	return UserResponse{
+		Name:     user.Name,
+		Username: user.Username,
+		Email:    *user.Email,
+	}
+}
+
 type Address struct {
 	BaseModel
 	Cep          string
@@ -24,8 +39,8 @@ type Address struct {
 	State        string
 }
 
-func (u *User) BeforeSave(tx *gorm.DB) error {
-	hashedPassword, err := hashPassword(u.Password)
+func (u *User) BeforeCreate(tx *gorm.DB) error {
+	hashedPassword, err := utils.HashPassword(u.Password)
 	if err != nil {
 		return err
 	}
@@ -34,10 +49,12 @@ func (u *User) BeforeSave(tx *gorm.DB) error {
 	return nil
 }
 
-func hashPassword(password string) (string, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func (u *User) BeforeUpdate(tx *gorm.DB) error {
+	hashedPassword, err := utils.HashPassword(u.Password)
 	if err != nil {
-		return "", err
+		return err
 	}
-	return string(hashedPassword), nil
+
+	u.Password = hashedPassword
+	return nil
 }
