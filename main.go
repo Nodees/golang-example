@@ -8,33 +8,20 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
 	app := fiber.New()
+	loadConfig, _ := config.LoadConfig(".")
 
-	loadConfig, err := config.LoadConfig(".")
-	if err != nil {
-		log.Fatal("Não foi possivel carregar variaveis de ambiente: ", err)
-	}
+	corsConfig := config.CorsConfig(&loadConfig)
+	app.Use(corsConfig)
 
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     loadConfig.ClientOrigin,
-		AllowHeaders:     "Origin, Content-Type, Accept",
-		AllowMethods:     "GET, POST, PATCH, DELETE",
-		AllowCredentials: true,
-	}))
+	connection.InitPostgresDB(&loadConfig)
+	models.Migrate(connection.DB)
 
-	connection.InitDB(&loadConfig)
-	connection.DB.AutoMigrate(
-		&models.User{},
-		&models.Address{},
-	)
-
-	authz := config.CasbinConfig(&loadConfig)
-
-	routes.SetupRoute(app, authz)
+	cas := config.CasbinConfig(&loadConfig)
+	routes.Routes(app, cas)
 
 	log.Fatal(app.Listen(":8000"))
 }

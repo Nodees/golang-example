@@ -11,7 +11,7 @@ import (
 
 var DB *gorm.DB
 
-func InitDB(conf *config.Config) {
+func InitPostgresDB(conf *config.Config) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", conf.DBHost, conf.DBUsername, conf.DBPassword, conf.DBName, conf.DBPort, conf.Sslmode)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 

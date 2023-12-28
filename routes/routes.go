@@ -5,7 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func SetupRoute(app *fiber.App, authz *casbin.Middleware) {
+func Routes(app *fiber.App, authz *casbin.Middleware) {
 	UserSetupRoutes(app, authz)
 	AddressSetupRoutes(app, authz)
 }

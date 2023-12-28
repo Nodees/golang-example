@@ -15,7 +15,7 @@ func CasbinConfig(conf *Config) *casbin.Middleware {
 	pollicyadapter, _ := gormadapter.NewAdapter(conf.Driver, dsn)
 
 	return casbin.New(casbin.Config{
-		ModelFilePath: "config/auth.model.conf",
+		ModelFilePath: "auth.model.conf",
 		PolicyAdapter: pollicyadapter,
 	})
 }
