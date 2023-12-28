@@ -30,15 +30,6 @@ func FilterUserRecord(user *User) UserResponse {
 	}
 }
 
-type Address struct {
-	BaseModel
-	Cep          *string `json:"cep"`
-	Street       *string `json:"street"`
-	Neighborhood *string `json:"neighborhood"`
-	City         *string `json:"city"`
-	State        *string `json:"state"`
-}
-
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	hashedPassword, err := utils.HashPassword(u.Password)
 	if err != nil {

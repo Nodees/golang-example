@@ -13,17 +13,18 @@ import (
 
 func main() {
 	app := fiber.New()
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:8000",
-		AllowHeaders:     "Origin, Content-Type, Accept",
-		AllowMethods:     "GET, POST, PATCH, DELETE",
-		AllowCredentials: true,
-	}))
 
 	loadConfig, err := config.LoadConfig(".")
 	if err != nil {
 		log.Fatal("Não foi possivel carregar variaveis de ambiente: ", err)
 	}
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     loadConfig.ClientOrigin,
+		AllowHeaders:     "Origin, Content-Type, Accept",
+		AllowMethods:     "GET, POST, PATCH, DELETE",
+		AllowCredentials: true,
+	}))
 
 	connection.InitDB(&loadConfig)
 	connection.DB.AutoMigrate(
@@ -31,7 +32,9 @@ func main() {
 		&models.Address{},
 	)
 
-	routes.SetupRoute(app)
+	authz := config.CasbinConfig(&loadConfig)
+
+	routes.SetupRoute(app, authz)
 
 	log.Fatal(app.Listen(":8000"))
 }

@@ -13,7 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func Login(c *fiber.Ctx) error {
+func LoginHandler(c *fiber.Ctx) error {
 	var payload *models.User
 
 	if err := c.BodyParser(&payload); err != nil {

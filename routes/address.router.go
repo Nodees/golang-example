@@ -1,16 +1,16 @@
 package routes
 
 import (
-	"core/config/middleware"
 	"core/controllers"
 
+	"github.com/gofiber/contrib/casbin"
 	"github.com/gofiber/fiber/v2"
 )
 
-func AddressSetupRoutes(app *fiber.App) {
-	app.Get("/api/address", middleware.DeserializeUser, controllers.AddressList)
-	app.Post("/api/address", middleware.DeserializeUser, controllers.AddressCreate)
-	app.Get("/api/address/:id", middleware.DeserializeUser, controllers.AddressRetrieve)
-	app.Delete("/api/address/:id", middleware.DeserializeUser, controllers.AddressDestroy)
-	app.Patch("/api/address/:id", middleware.DeserializeUser, controllers.AddressUpdate)
+func AddressSetupRoutes(app *fiber.App, authz *casbin.Middleware) {
+	app.Get("/api/address", controllers.AddressList)
+	app.Post("/api/address", controllers.AddressCreate)
+	app.Get("/api/address/:id", controllers.AddressRetrieve)
+	app.Delete("/api/address/:id", controllers.AddressDestroy)
+	app.Patch("/api/address/:id", controllers.AddressUpdate)
 }

@@ -20,6 +20,8 @@ type Config struct {
 
 	ClientOrigin string `mapstructure:"CLIENT_ORIGIN"`
 	Domain       string `mapstructure:"DOMAIN"`
+	Driver       string `mapstructure:"DRIVER"`
+	Port         string `mapstructure:"PORT"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
