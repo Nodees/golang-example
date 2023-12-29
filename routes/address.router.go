@@ -3,11 +3,10 @@ package routes
 import (
 	"core/controllers"
 
-	"github.com/gofiber/contrib/casbin"
 	"github.com/gofiber/fiber/v2"
 )
 
-func AddressSetupRoutes(app *fiber.App, authz *casbin.Middleware) {
+func AddressSetupRoutes(app *fiber.App) {
 	app.Get("/api/address", controllers.AddressList)
 	app.Post("/api/address", controllers.AddressCreate)
 	app.Get("/api/address/:id", controllers.AddressRetrieve)

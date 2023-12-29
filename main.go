@@ -16,12 +16,13 @@ func main() {
 
 	corsConfig := config.CorsConfig(&loadConfig)
 	app.Use(corsConfig)
+	app.Use(config.Authenticate(&loadConfig))
 
 	connection.InitPostgresDB(&loadConfig)
 	models.Migrate(connection.DB)
 
-	cas := config.CasbinConfig(&loadConfig)
-	routes.Routes(app, cas)
+	// cas := config.Authenticate(&loadConfig)
+	routes.Routes(app)
 
 	log.Fatal(app.Listen(":8000"))
 }

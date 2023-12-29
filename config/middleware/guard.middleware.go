@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"core/config"
 	connection "core/connections"
 	"core/models"
@@ -8,6 +9,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/casbin/casbin/v2"
+	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 )
@@ -58,4 +61,21 @@ func DeserializeUser(c *fiber.Ctx) error {
 	c.Locals("user", models.FilterUserRecord(&user))
 
 	return c.Next()
+}
+
+func Enforce(ctx context.Context, sub string, obj string, act string, adapter *gormadapter.Adapter) (bool, error) {
+	enforcer, err := casbin.NewEnforcer("", adapter)
+	if err != nil {
+		return false, fmt.Errorf("failed to load policy from DB: %w", err)
+	}
+	err = enforcer.LoadPolicy()
+	if err != nil {
+		return false, fmt.Errorf("failed to load policy from DB: %w", err)
+	}
+	ok, err := enforcer.Enforce(sub, obj, act)
+	if err != nil {
+		return false, fmt.Errorf("error in policy: %w", err)
+	}
+
+	return ok, nil
 }

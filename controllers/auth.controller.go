@@ -42,6 +42,7 @@ func LoginHandler(c *fiber.Ctx) error {
 	}
 
 	claims["sub"] = user.ID
+	claims["usr"] = user.Username
 	claims["exp"] = now.Add(conf.JwtExpiresIn).Unix()
 	claims["iat"] = now.Unix()
 	claims["nbf"] = now.Unix()
