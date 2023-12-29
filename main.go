@@ -1,10 +1,11 @@
 package main
 
 import (
-	"core/config"
+	"core/configs"
+	"core/configs/middleware"
 	connection "core/connections"
 	"core/models"
-	"core/routes"
+	"core/routers"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,17 +13,17 @@ import (
 
 func main() {
 	app := fiber.New()
-	loadConfig, _ := config.LoadConfig(".")
+	loadConfig, _ := configs.LoadConfig(".")
 
-	corsConfig := config.CorsConfig(&loadConfig)
+	corsConfig := configs.CorsConfig(&loadConfig)
 	app.Use(corsConfig)
-	app.Use(config.Authenticate(&loadConfig))
+	app.Use(middleware.Authenticate(&loadConfig))
 
 	connection.InitPostgresDB(&loadConfig)
 	models.Migrate(connection.DB)
 
 	// cas := config.Authenticate(&loadConfig)
-	routes.Routes(app)
+	routers.Init(app)
 
 	log.Fatal(app.Listen(":8000"))
 }

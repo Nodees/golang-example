@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"core/config"
+	"core/configs"
 	connection "core/connections"
 	"core/models"
 	"fmt"
@@ -21,7 +21,7 @@ func LoginHandler(c *fiber.Ctx) error {
 	}
 
 	var user models.User
-	result := connection.DB.First(&user, "username = ?", payload.Username)
+	result := connection.DB.First(&user, "tx_username = ?", payload.Username)
 	if result.Error != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "fail", "message": "Invalid username or Password"})
 	}
@@ -36,13 +36,12 @@ func LoginHandler(c *fiber.Ctx) error {
 	now := time.Now().UTC()
 	claims := tokenByte.Claims.(jwt.MapClaims)
 
-	conf, err := config.LoadConfig(".")
+	conf, err := configs.LoadConfig(".")
 	if err != nil {
 		log.Fatal("Não foi possivel carregar variaveis de ambiente: ", err)
 	}
 
 	claims["sub"] = user.ID
-	claims["usr"] = user.Username
 	claims["exp"] = now.Add(conf.JwtExpiresIn).Unix()
 	claims["iat"] = now.Unix()
 	claims["nbf"] = now.Unix()

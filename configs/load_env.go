@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"time"
@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
+type Env struct {
 	DBHost     string `mapstructure:"POSTGRES_HOST"`
 	DBUsername string `mapstructure:"POSTGRES_USER"`
 	DBPassword string `mapstructure:"POSTGRES_PASSWORD"`
@@ -24,7 +24,7 @@ type Config struct {
 	Port         string `mapstructure:"PORT"`
 }
 
-func LoadConfig(path string) (config Config, err error) {
+func LoadConfig(path string) (config Env, err error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigType("env")
 	viper.SetConfigName("app")

@@ -33,3 +33,12 @@ func GetUserFromToken(token string, secret string) (jwt.MapClaims, error) {
 
 	return claims, nil
 }
+
+func In(value any, list []string) bool {
+	for _, item := range list {
+		if item == value {
+			return true
+		}
+	}
+	return false
+}

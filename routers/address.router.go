@@ -1,4 +1,4 @@
-package routes
+package routers
 
 import (
 	"core/controllers"
@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func AddressSetupRoutes(app *fiber.App) {
+func AddressSetupRouter(app *fiber.App) {
 	app.Get("/api/address", controllers.AddressList)
 	app.Post("/api/address", controllers.AddressCreate)
 	app.Get("/api/address/:id", controllers.AddressRetrieve)
