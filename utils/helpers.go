@@ -36,7 +36,7 @@ func GetUserFromToken(token string, secret string) (jwt.MapClaims, error) {
 
 func In(value any, list []string) bool {
 	for _, item := range list {
-		if item == value {
+		if item == "*" || item == value {
 			return true
 		}
 	}

@@ -56,15 +56,12 @@ func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 			}
 
 			for _, policy := range policies {
-				if path != policy.Path {
-					return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
-				}
-
-				if !utils.In(method, policy.Methods) {
-					return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+				if path == policy.Path || policy.Path == "*" || utils.In(method, policy.Methods) {
+					return c.Next()
 				}
 			}
-			return c.Next()
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+
 		}
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
