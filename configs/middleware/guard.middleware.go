@@ -56,7 +56,10 @@ func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 			}
 
 			for _, policy := range policies {
-				if path == policy.Path || policy.Path == utils.AllPaths || utils.In(method, policy.Methods) {
+				// o if tem tres condicoes com '||' por que ele itera em cima da lista policies,
+				// se um dos paths for diferente e ele for o ultimo aparecera unauthorized
+				// e usar o break para quebrar o loop abruptamente e seria uma má pratica
+				if path == policy.Path || policy.Path == utils.AllPaths || utils.InMethod(method, policy.Methods) {
 					return c.Next()
 				}
 			}

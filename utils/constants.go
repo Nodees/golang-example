@@ -5,5 +5,5 @@ const (
 	UserPath   = "/api/user"
 	AllPaths   = "*"
 	PostMethod = "POST"
-	AllMethods = "POST"
+	AllMethods = "*"
 )

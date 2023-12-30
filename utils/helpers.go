@@ -34,7 +34,7 @@ func GetUserFromToken(token string, secret string) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
-func In(value any, list []string) bool {
+func InMethod(value any, list []string) bool {
 	for _, item := range list {
 		if item == AllMethods || item == value {
 			return true
