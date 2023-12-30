@@ -75,7 +75,7 @@ func BaseUpdate[T any]() fiber.Handler {
 		if err != nil {
 			return err
 		}
-		result := connection.DB.Find(model, id).Updates(model)
+		result := connection.DB.Model(model).Where("id = ?", id).Updates(model)
 		if result.Error != nil {
 			return result.Error
 		}

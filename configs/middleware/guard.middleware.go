@@ -22,7 +22,7 @@ func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 		method := c.Method()
 		path := c.Path()
 
-		if (path == "/api/login" || path == "/api/user") && method == "POST" {
+		if (path == utils.LoginPath || path == utils.UserPath) && method == utils.PostMethod {
 			return c.Next()
 		}
 
@@ -56,7 +56,7 @@ func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 			}
 
 			for _, policy := range policies {
-				if path == policy.Path || policy.Path == "*" || utils.In(method, policy.Methods) {
+				if path == policy.Path || policy.Path == utils.AllPaths || utils.In(method, policy.Methods) {
 					return c.Next()
 				}
 			}
