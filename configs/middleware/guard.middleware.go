@@ -55,15 +55,21 @@ func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 			}
 
+			mapping := map[string]pq.StringArray{}
+
 			for _, policy := range policies {
-				// o if tem tres condicoes com '||' por que ele itera em cima da lista policies,
-				// se um dos paths for diferente e ele for o ultimo aparecera unauthorized
-				// e usar o break para quebrar o loop abruptamente e seria uma má pratica
-				if path == policy.Path || policy.Path == utils.AllPaths || utils.InMethod(method, policy.Methods) {
-					return c.Next()
-				}
+				mapping[policy.Path] = policy.Methods
 			}
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+
+			if res := mapping[path]; len(res) == 0 {
+				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+			}
+
+			if ok := utils.InMethod(method, mapping[path]); !ok {
+				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+			}
+
+			return c.Next()
 
 		}
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
