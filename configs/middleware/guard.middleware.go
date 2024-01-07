@@ -14,6 +14,13 @@ import (
 	"gorm.io/gorm"
 )
 
+func getMethods(super bool, superMethods pq.StringArray, mapMethods pq.StringArray) pq.StringArray {
+	if super {
+		return superMethods
+	}
+	return mapMethods
+}
+
 func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		authorization := c.Get("Authorization")
@@ -21,13 +28,18 @@ func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 		tokenString := strings.TrimPrefix(authorization, "Bearer ")
 		method := c.Method()
 		path := c.Path()
+		if path == "api/swagger" && method == "GET" {
+			return c.Next()
+		}
 
 		if (path == utils.LoginPath || path == utils.UserPath) && method == utils.PostMethod {
 			return c.Next()
 		}
+
 		if len(strings.Split(path, "/")) >= 3 {
 			path = strings.Join(strings.Split(path, "/")[0:3], "/")
 		}
+
 		if tokenString != "" {
 			claim, _ := utils.GetUserFromToken(tokenString, env.JwtSecret)
 
@@ -68,11 +80,14 @@ func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 				}
 			}
 
-			if res := mapping[path]; len(res) == 0 {
+			res, anyPaths := mapping["*"]
+			if _, ok := mapping[path]; !anyPaths && !ok {
 				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 			}
 
-			if ok := utils.InMethod(method, mapping[path]); !ok {
+			methods := getMethods(anyPaths, res, mapping[path])
+
+			if ok := utils.InMethod(method, methods); !ok {
 				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 			}
 
