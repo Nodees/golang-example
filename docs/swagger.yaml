@@ -1,0 +1,71 @@
+definitions:
+  models.Address:
+    properties:
+      cep:
+        type: string
+      city:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      neighborhood:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.User:
+    properties:
+      address:
+        $ref: '#/definitions/models.Address'
+      addressID:
+        type: integer
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/user:
+    post:
+      consumes:
+      - application/json
+      description: Create new user
+      parameters:
+      - description: User
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Create new user
+      tags:
+      - users
+swagger: "2.0"
