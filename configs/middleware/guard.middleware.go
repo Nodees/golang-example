@@ -25,7 +25,9 @@ func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 		if (path == utils.LoginPath || path == utils.UserPath) && method == utils.PostMethod {
 			return c.Next()
 		}
-
+		if len(strings.Split(path, "/")) >= 3 {
+			path = strings.Join(strings.Split(path, "/")[0:3], "/")
+		}
 		if tokenString != "" {
 			claim, _ := utils.GetUserFromToken(tokenString, env.JwtSecret)
 
@@ -58,7 +60,12 @@ func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 			mapping := map[string]pq.StringArray{}
 
 			for _, policy := range policies {
-				mapping[policy.Path] = policy.Methods
+				if policy.Path != utils.AllPaths {
+					mapping[policy.Path] = policy.Methods
+				} else {
+					path, method = "*", "*"
+					mapping[policy.Path] = pq.StringArray{policy.Path}
+				}
 			}
 
 			if res := mapping[path]; len(res) == 0 {
