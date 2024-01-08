@@ -72,12 +72,7 @@ func Authenticate(env *configs.Env) func(*fiber.Ctx) error {
 			mapping := map[string]pq.StringArray{}
 
 			for _, policy := range policies {
-				if policy.Path != utils.AllPaths {
-					mapping[policy.Path] = policy.Methods
-				} else {
-					path, method = "*", "*"
-					mapping[policy.Path] = pq.StringArray{policy.Path}
-				}
+				mapping[policy.Path] = policy.Methods
 			}
 
 			res, anyPaths := mapping["*"]
